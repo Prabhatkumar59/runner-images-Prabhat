@@ -1,0 +1,19 @@
+name: Check Python Version
+
+on: [push, pull_request]
+
+jobs:
+  check-python-version:
+    runs-on: windows-2022
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.7.9'
+
+    - name: Check Python version
+      run: python --version
