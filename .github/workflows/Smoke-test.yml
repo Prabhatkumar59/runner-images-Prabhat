@@ -1,0 +1,48 @@
+name: Java Application with CRAC and CRIU (With Permissions)
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Step 2: Set up JDK with CRAC support
+      - name: Set up JDK with CRAC
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          java-package: 'jdk+crac'
+          distribution: 'zulu'
+
+      # Step 3: Set up CRIU with permissions
+      - name: Set up CRIU with permissions
+        run: |
+          sudo chown root:root $(find /opt/hostedtoolcache -name criu -type f)
+          sudo chmod +s $(find /opt/hostedtoolcache -name criu -type f)
+
+      # Step 4: Build the Java application
+      - name: Build Java application
+        run: ./gradlew build
+
+      # Step 5: Run the Java application (with CRAC for checkpointing)
+      - name: Run Java application with CRAC
+        run: java -XX:+CRAC your.application.MainClass
+
+      # Step 6: Checkpoint the Java application
+      - name: Checkpoint Java application
+        run: sudo criu dump -t $(pgrep -f your.application.MainClass) --images-dir /path/to/checkpoint/dir --shell-job
+
+      # Step 7: Restore the Java application
+      - name: Restore Java application
+        run: sudo criu restore --images-dir /path/to/checkpoint/dir --shell-job
