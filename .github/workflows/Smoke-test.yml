@@ -3,10 +3,10 @@ name: Java Application with CRAC and CRIU (With Permissions)
 on:
   push:
     branches:
-      - main
+      - Python_issue
   pull_request:
     branches:
-      - main
+      - Python_issue
 
 jobs:
   build:
