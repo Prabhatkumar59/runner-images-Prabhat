@@ -12,9 +12,23 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Cache APT packages
+        uses: actions/cache@v2
+        with:
+          path: /var/cache/apt
+          key: ${{ runner.os }}-apt
+          restore-keys: ${{ runner.os }}-apt
+
+      - name: Cache APT lists
+        uses: actions/cache@v2
+        with:
+          path: /var/lib/apt/lists
+          key: ${{ runner.os }}-apt-lists
+          restore-keys: ${{ runner.os }}-apt-lists
+
       - name: Update APT and Install Zip
         run: |
-          sudo apt-get update
+          sudo apt-get update -qq
           sudo apt-get install -y zip
 
       - name: Verify Zip Installation
