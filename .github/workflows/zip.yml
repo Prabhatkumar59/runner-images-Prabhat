@@ -1,32 +1,23 @@
-name: Check Zip Availability
+name: Install Zip Package
 
 on:
   push:
     branches:
-      - Zip-buffer  # Change to your target branch
+      - Zip-buffer
 
 jobs:
-  check-zip:
-    runs-on: ubuntu-2024  # Specify the Ubuntu 2024 image
-
+  build:
+    runs-on: ubuntu-2024.04
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Cache zip
-        uses: actions/cache@v2
-        with:
-          path: /usr/bin/zip
-          key: ${{ runner.os }}-zip
-          restore-keys: |
-            ${{ runner.os }}-zip
-
-      - name: Install zip
-        if: steps.cache.outputs.cache-hit != 'true'
+      - name: Update APT and Install Zip
         run: |
-          sudo apt-get update -qq
+          sudo apt-get update
           sudo apt-get install -y zip
 
-      - name: Check zip version
+      - name: Verify Zip Installation
         run: |
-          zip --version || echo "Zip is not available"
+          zip --version
+          echo "Zip is installed and available."
